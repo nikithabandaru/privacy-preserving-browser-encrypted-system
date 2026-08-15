@@ -3,6 +3,7 @@ import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { FileText, Image as ImageIcon, Video, Lock, ShieldCheck, Search, Loader2 } from 'lucide-react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 import { decryptBlob } from '../utils/crypto';
 
 const SearchResults = () => {
@@ -34,7 +35,7 @@ const SearchResults = () => {
     }
     try {
       const token = await currentUser.getIdToken();
-      const response = await axios.get(`http://localhost:8080/api/assets/download/${assetId}`, {
+      const response = await axios.get(`${API_BASE_URL}/api/assets/download/${assetId}`, {
         headers: { 'Authorization': `Bearer ${token}` },
         responseType: 'blob',
       });
@@ -70,7 +71,7 @@ const SearchResults = () => {
       setIsLoading(true);
       try {
         const token = await currentUser.getIdToken();
-        const response = await axios.get(`http://localhost:8080/api/search?q=${encodeURIComponent(searchQuery)}`, {
+        const response = await axios.get(`${API_BASE_URL}/api/search?q=${encodeURIComponent(searchQuery)}`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         setResults(response.data);

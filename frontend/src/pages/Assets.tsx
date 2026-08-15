@@ -3,6 +3,7 @@ import { Upload, FileText, Image as ImageIcon, Video, MoreVertical, Search, Filt
 import { useAuth } from '../contexts/AuthContext';
 import { useOutletContext } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 import { encryptFile, decryptBlob } from '../utils/crypto';
 
 const Assets = ({ type }: { type: 'images' | 'videos' | 'documents' }) => {
@@ -27,7 +28,7 @@ const Assets = ({ type }: { type: 'images' | 'videos' | 'documents' }) => {
     try {
       setIsLoading(true);
       const token = await currentUser.getIdToken();
-      let url = `http://localhost:8080/api/assets?category=${type}`;
+      let url = `${API_BASE_URL}/api/assets?category=${type}`;
       if (searchQuery && searchQuery.trim() !== '') {
         url += `&search=${encodeURIComponent(searchQuery)}`;
       }
@@ -72,7 +73,7 @@ const Assets = ({ type }: { type: 'images' | 'videos' | 'documents' }) => {
       formData.append('file', encryptedFile);
       formData.append('originalType', file.type);
 
-      await axios.post('http://localhost:8080/api/assets/upload', formData, {
+      await axios.post(`${API_BASE_URL}/api/assets/upload`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
@@ -107,7 +108,7 @@ const Assets = ({ type }: { type: 'images' | 'videos' | 'documents' }) => {
 
     try {
       const token = await currentUser.getIdToken();
-      const response = await axios.get(`http://localhost:8080/api/assets/download/${assetId}`, {
+      const response = await axios.get(`${API_BASE_URL}/api/assets/download/${assetId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         },

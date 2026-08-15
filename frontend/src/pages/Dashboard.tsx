@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Image, Video, FileText, UploadCloud, Activity, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 interface DashboardData {
   totalAssets: number;
@@ -35,7 +36,7 @@ const Dashboard = () => {
       try {
         setIsLoading(true);
         const token = await currentUser.getIdToken();
-        const response = await axios.get('http://localhost:8080/api/dashboard', {
+        const response = await axios.get(`${API_BASE_URL}/api/dashboard`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         setData(response.data);

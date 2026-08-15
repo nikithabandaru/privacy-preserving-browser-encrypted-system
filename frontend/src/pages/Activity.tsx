@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Activity as ActivityIcon, Upload, Download, Trash, RefreshCw, Loader2 } from 'lucide-react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 import { auth } from '../config/firebase';
 
 interface ActivityLog {
@@ -22,7 +23,7 @@ const Activity = () => {
         const user = auth.currentUser;
         if (!user) return;
         const token = await user.getIdToken();
-        const response = await axios.get('http://localhost:8080/api/activity', {
+        const response = await axios.get(`${API_BASE_URL}/api/activity`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setLogs(response.data);

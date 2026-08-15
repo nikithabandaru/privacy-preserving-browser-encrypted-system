@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, LogOut, Upload, Loader2 } from 'lucide-react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 const Navbar = ({ onSearch }: { onSearch?: (q: string) => void }) => {
   const { currentUser, logout } = useAuth();
@@ -33,7 +34,7 @@ const Navbar = ({ onSearch }: { onSearch?: (q: string) => void }) => {
       const formData = new FormData();
       formData.append('file', file);
 
-      await axios.post('http://localhost:8080/api/assets/upload', formData, {
+      await axios.post(`${API_BASE_URL}/api/assets/upload`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',

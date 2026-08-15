@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Shield, Users, FileText, Download, Filter, X, Eye } from 'lucide-react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 interface UserData {
   uid: string;
@@ -40,12 +41,12 @@ const AdminDashboard = () => {
     try {
       const token = await currentUser?.getIdToken();
       if (activeTab === 'users') {
-        const response = await axios.get('http://localhost:8080/api/admin/users', {
+        const response = await axios.get(`${API_BASE_URL}/api/admin/users`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUsers(response.data);
       } else {
-        const response = await axios.get('http://localhost:8080/api/admin/assets', {
+        const response = await axios.get(`${API_BASE_URL}/api/admin/assets`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setAssets(response.data);
@@ -77,7 +78,7 @@ const AdminDashboard = () => {
       try {
         const { decryptBlob } = await import('../utils/crypto');
         const token = await currentUser.getIdToken();
-        const response = await axios.get(`http://localhost:8080/api/assets/download/${assetId}`, {
+        const response = await axios.get(`${API_BASE_URL}/api/assets/download/${assetId}`, {
           headers: { 'Authorization': `Bearer ${token}` },
           responseType: 'blob'
         });
@@ -122,7 +123,7 @@ const AdminDashboard = () => {
     
     try {
       const token = await currentUser?.getIdToken();
-      const response = await axios.get(`http://localhost:8080/api/assets/download/${assetId}`, {
+      const response = await axios.get(`${API_BASE_URL}/api/assets/download/${assetId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         },
