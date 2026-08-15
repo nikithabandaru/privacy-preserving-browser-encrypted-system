@@ -1,0 +1,33 @@
+# Secrets and credentials (NEVER COMMIT)
+**/firebase-service-account.json
+*.json.key
+
+# Build outputs and targets
+**/target/
+**/dist/
+**/build/
+**/node_modules/
+**/uploads/
+
+# User uploads and binary sample files
+*.pptx
+*.docx
+*.pdf
+*.jpg
+*.png
+*.mp4
+
+# Logs and temporary files
+*.log
+*.jar
+*.war
+*.tmp
+
+# Environment and secrets
+.env
+.env.local
+
+# IDE and OS settings
+.DS_Store
+.vscode/
+.idea/
