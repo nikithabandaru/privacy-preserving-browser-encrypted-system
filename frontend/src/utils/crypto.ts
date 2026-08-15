@@ -31,7 +31,7 @@ export async function deriveKey(passphrase: string, uid: string): Promise<Crypto
   return window.crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt: salt,
+      salt: salt as unknown as BufferSource,
       iterations: 100000,
       hash: 'SHA-256'
     },
@@ -58,7 +58,7 @@ export async function encryptFile(file: File, key: CryptoKey): Promise<Blob> {
       iv: iv
     },
     key,
-    fileBytes
+    fileBytes as ArrayBuffer
   );
 
   // Combine IV (12 bytes) and ciphertext
@@ -90,7 +90,7 @@ export async function decryptBlob(encryptedBlob: Blob, key: CryptoKey, originalM
       iv: iv
     },
     key,
-    ciphertext
+    ciphertext as unknown as BufferSource
   );
 
   return new Blob([decryptedBuffer], { type: originalMimeType });
