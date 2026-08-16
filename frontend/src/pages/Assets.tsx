@@ -238,8 +238,8 @@ const Assets = ({ type }: { type: 'images' | 'videos' | 'documents' }) => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
           {assets.map((asset) => (
-            <div key={asset.assetId} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow group">
-              <div className="h-48 bg-gray-100 dark:bg-gray-900 flex items-center justify-center relative">
+            <div key={asset.assetId} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-visible hover:shadow-lg transition-shadow group">
+              <div className="h-48 bg-gray-100 dark:bg-gray-900 rounded-t-xl overflow-hidden flex items-center justify-center relative">
                 {getIcon()}
                 {asset.encryptedAtRest && (
                   <div className="absolute top-2 right-2 flex items-center space-x-1 bg-emerald-500/90 text-white text-xs px-2 py-1 rounded-full">
@@ -247,7 +247,7 @@ const Assets = ({ type }: { type: 'images' | 'videos' | 'documents' }) => {
                     <span>Encrypted</span>
                   </div>
                 )}
-                <div className="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center transition-all">
+                <div className="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center transition-all z-0">
                   <button 
                     onClick={() => handlePreview(asset.assetId, asset.originalFileName, asset.fileType)}
                     className="bg-white text-gray-900 px-4 py-2 rounded-lg font-medium text-sm hover:bg-gray-100 shadow-lg"
@@ -283,7 +283,7 @@ const Assets = ({ type }: { type: 'images' | 'videos' | 'documents' }) => {
                       <MoreVertical className="w-5 h-5" />
                     </button>
                     {activeMenuId === asset.assetId && (
-                      <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-10 py-1">
+                      <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50 py-1">
                         <button 
                           onClick={() => alert(`Details:\\nFile: ${asset.originalFileName}\\nSize: ${asset.fileSize} bytes\\nType: ${asset.fileType}\\nStatus: ${asset.status}`)}
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
