@@ -154,8 +154,8 @@ public class AssetController {
                 return ResponseEntity.status(404).body(Map.of("error", "Asset not found"));
             }
 
-            if (!uid.equals(asset.getUploadedBy()) && !isAdmin) {
-                return ResponseEntity.status(403).body(Map.of("error", "Access Denied"));
+            if (!uid.equals(asset.getUploadedBy())) {
+                return ResponseEntity.status(403).body(Map.of("error", "Access Denied - You can only delete your own files"));
             }
 
             // Delete raw blob from GridFS

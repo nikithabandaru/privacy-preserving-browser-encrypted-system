@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Shield, Users, FileText, Download, Filter, X, Eye, Trash2 } from 'lucide-react';
+import { Shield, Users, FileText, Download, Filter, X, Eye } from 'lucide-react';
 import axios from 'axios';
 import { API_BASE_URL } from '../config/api';
 
@@ -50,21 +50,6 @@ const AdminDashboard = () => {
       console.error('Failed to fetch admin data', err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleDelete = async (assetId: string) => {
-    if (!currentUser) return;
-    if (!window.confirm("Are you sure you want to delete this user's file? This action cannot be undone.")) return;
-    try {
-      const token = await currentUser.getIdToken();
-      await axios.delete(`${API_BASE_URL}/api/assets/${assetId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      fetchData(); // Refresh list after delete
-    } catch (error) {
-      console.error('Delete failed:', error);
-      alert('Failed to delete file.');
     }
   };
 
@@ -275,20 +260,13 @@ const AdminDashboard = () => {
                       <td className="p-4 text-gray-900 dark:text-gray-300 font-medium truncate max-w-xs" title={a.uploadedBy}>{getUserDisplay(a.uploadedBy)}</td>
                       <td className="p-4 text-gray-500">{formatBytes(a.fileSize)}</td>
                       <td className="p-4 text-gray-500">{a.uploadDate ? new Date(a.uploadDate).toLocaleDateString() : 'Unknown'}</td>
-                      <td className="p-4 text-right flex items-center justify-end space-x-2">
+                      <td className="p-4 text-right">
                         <button 
                           onClick={() => handleDownloadEncrypted(a.assetId, a.originalFileName, a.uploadedBy, a.fileType)} 
                           className={`p-2 rounded-lg transition-colors ${isOwnFile ? 'text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/50' : 'text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-900/50'}`}
                           title={isOwnFile ? "View Your File" : "Download Encrypted Blob"}
                         >
                           {isOwnFile ? <Eye className="w-4 h-4" /> : <Download className="w-4 h-4" />}
-                        </button>
-                        <button
-                          onClick={() => handleDelete(a.assetId)}
-                          className="p-2 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900/50 transition-colors"
-                          title="Delete File"
-                        >
-                          <Trash2 className="w-4 h-4" />
                         </button>
                       </td>
                     </tr>
