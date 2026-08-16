@@ -34,28 +34,28 @@ const AdminDashboard = () => {
     if (isAdmin && currentUser) {
       fetchData();
     }
-  }, [isAdmin, currentUser, activeTab]);
+  }, [isAdmin, currentUser]);
 
   const fetchData = async () => {
     setLoading(true);
     try {
       const token = await currentUser?.getIdToken();
-      if (activeTab === 'users') {
-        const response = await axios.get(`${API_BASE_URL}/api/admin/users`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setUsers(response.data);
-      } else {
-        const response = await axios.get(`${API_BASE_URL}/api/admin/assets`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setAssets(response.data);
-      }
+      const [usersRes, assetsRes] = await Promise.all([
+        axios.get(`${API_BASE_URL}/api/admin/users`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${API_BASE_URL}/api/admin/assets`, { headers: { Authorization: `Bearer ${token}` } })
+      ]);
+      setUsers(usersRes.data);
+      setAssets(assetsRes.data);
     } catch (err) {
       console.error('Failed to fetch admin data', err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const getUserDisplay = (uid: string) => {
+    const user = users.find(u => u.uid === uid);
+    return user ? user.email : uid;
   };
 
   const handleDownloadEncrypted = async (assetId: string, originalFileName: string, uploadedBy: string, fileType: string) => {
@@ -257,7 +257,7 @@ const AdminDashboard = () => {
                   return (
                     <tr key={a.assetId} className="border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/50">
                       <td className="p-4 font-medium text-gray-900 dark:text-white">{a.originalFileName}</td>
-                      <td className="p-4 text-gray-500 text-sm font-mono truncate max-w-xs" title={a.uploadedBy}>{a.uploadedBy}</td>
+                      <td className="p-4 text-gray-900 dark:text-gray-300 font-medium truncate max-w-xs" title={a.uploadedBy}>{getUserDisplay(a.uploadedBy)}</td>
                       <td className="p-4 text-gray-500">{formatBytes(a.fileSize)}</td>
                       <td className="p-4 text-gray-500">{a.uploadDate ? new Date(a.uploadDate).toLocaleDateString() : 'Unknown'}</td>
                       <td className="p-4 text-right">
