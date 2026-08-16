@@ -267,7 +267,7 @@ const Assets = ({ type }: { type: 'images' | 'videos' | 'documents' }) => {
                     <span>Encrypted</span>
                   </div>
                 )}
-                <div className="absolute inset-0 bg-black/40 hidden md:group-hover:flex items-center justify-center transition-all z-0 pointer-events-none">
+                <div className="absolute inset-0 bg-black/40 flex md:hidden group-hover:flex items-center justify-center transition-all z-0 pointer-events-none">
                   <div className="bg-white text-gray-900 px-4 py-2 rounded-lg font-medium text-sm shadow-lg pointer-events-auto">
                     Preview
                   </div>
