@@ -1,6 +1,8 @@
 package com.dams.backend.controllers;
 
 import com.dams.backend.models.AssetMetadata;
+import com.dams.backend.models.UserProfile;
+import com.dams.backend.repositories.UserProfileRepository;
 import com.dams.backend.services.MongoMetadataService;
 import com.dams.backend.services.MongoStorageService;
 import com.google.firebase.auth.ExportedUserRecord;
@@ -22,10 +24,12 @@ public class AdminController {
 
     private final MongoMetadataService mongoMetadataService;
     private final MongoStorageService mongoStorageService;
+    private final UserProfileRepository userProfileRepository;
 
-    public AdminController(MongoMetadataService mongoMetadataService, MongoStorageService mongoStorageService) {
+    public AdminController(MongoMetadataService mongoMetadataService, MongoStorageService mongoStorageService, UserProfileRepository userProfileRepository) {
         this.mongoMetadataService = mongoMetadataService;
         this.mongoStorageService = mongoStorageService;
+        this.userProfileRepository = userProfileRepository;
     }
 
     private boolean isAdmin() {
@@ -40,17 +44,29 @@ public class AdminController {
         try {
             Map<String, Map<String, Object>> userMap = new LinkedHashMap<>();
 
-            // 1. Try to fetch from Firebase Auth Admin SDK
+            // 1. Fetch from MongoDB UserProfiles (real logged-in user emails)
+            List<UserProfile> profiles = userProfileRepository.findAll();
+            for (UserProfile p : profiles) {
+                Map<String, Object> u = new HashMap<>();
+                u.put("uid", p.getUid());
+                u.put("email", p.getEmail() != null ? p.getEmail() : p.getUid());
+                u.put("displayName", p.getDisplayName());
+                u.put("creationTimestamp", p.getLastLoginDate() != null ? p.getLastLoginDate().getTime() : System.currentTimeMillis());
+                u.put("lastSignInTimestamp", p.getLastLoginDate() != null ? p.getLastLoginDate().getTime() : System.currentTimeMillis());
+                userMap.put(p.getUid(), u);
+            }
+
+            // 2. Try to fetch from Firebase Auth Admin SDK
             try {
                 if (FirebaseAuth.getInstance() != null) {
                     ListUsersPage page = FirebaseAuth.getInstance().listUsers(null);
                     while (page != null) {
                         for (ExportedUserRecord user : page.getValues()) {
-                            Map<String, Object> u = new HashMap<>();
+                            Map<String, Object> u = userMap.getOrDefault(user.getUid(), new HashMap<>());
                             u.put("uid", user.getUid());
-                            u.put("email", (user.getEmail() != null && !user.getEmail().isEmpty()) 
-                                    ? user.getEmail() 
-                                    : "User (" + user.getUid().substring(0, Math.min(8, user.getUid().length())) + ")");
+                            if (user.getEmail() != null && !user.getEmail().isEmpty()) {
+                                u.put("email", user.getEmail());
+                            }
                             u.put("displayName", user.getDisplayName());
                             u.put("creationTimestamp", user.getUserMetadata().getCreationTimestamp());
                             u.put("lastSignInTimestamp", user.getUserMetadata().getLastSignInTimestamp());
@@ -60,10 +76,10 @@ public class AdminController {
                     }
                 }
             } catch (Exception e) {
-                System.err.println("Firebase listUsers exception, aggregating users from MongoDB: " + e.getMessage());
+                System.err.println("Firebase listUsers warning: " + e.getMessage());
             }
 
-            // 2. Also aggregate all distinct UIDs from MongoDB assets so no user is ever missed
+            // 3. Aggregate all distinct UIDs from MongoDB assets so no uploader is missed
             List<AssetMetadata> allAssets = mongoMetadataService.getAllAssetsGlobally();
             for (AssetMetadata asset : allAssets) {
                 if (asset.getUploadedBy() != null && !userMap.containsKey(asset.getUploadedBy())) {
