@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Image, Video, FileText, UploadCloud, Activity, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
@@ -49,11 +50,13 @@ const Dashboard = () => {
     fetchDashboard();
   }, [currentUser]);
 
+  const navigate = useNavigate();
+
   const stats = [
-    { label: 'Total Assets', value: data?.totalAssets ?? 0, icon: UploadCloud, color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' },
-    { label: 'Images', value: data?.imagesCount ?? 0, icon: Image, color: 'text-emerald-600', bg: 'bg-emerald-100 dark:bg-emerald-900/30' },
-    { label: 'Videos', value: data?.videosCount ?? 0, icon: Video, color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30' },
-    { label: 'Documents', value: data?.documentsCount ?? 0, icon: FileText, color: 'text-orange-600', bg: 'bg-orange-100 dark:bg-orange-900/30' },
+    { label: 'Total Assets', value: data?.totalAssets ?? 0, icon: UploadCloud, color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30', path: '/' },
+    { label: 'Images', value: data?.imagesCount ?? 0, icon: Image, color: 'text-emerald-600', bg: 'bg-emerald-100 dark:bg-emerald-900/30', path: '/images' },
+    { label: 'Videos', value: data?.videosCount ?? 0, icon: Video, color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30', path: '/videos' },
+    { label: 'Documents', value: data?.documentsCount ?? 0, icon: FileText, color: 'text-orange-600', bg: 'bg-orange-100 dark:bg-orange-900/30', path: '/documents' },
   ];
 
   return (
@@ -66,7 +69,11 @@ const Dashboard = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, idx) => (
-          <div key={idx} className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center space-x-4">
+          <div 
+            key={idx} 
+            onClick={() => navigate(stat.path)}
+            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center space-x-4 cursor-pointer hover:shadow-md transition-shadow"
+          >
             <div className={`p-3 rounded-lg ${stat.bg}`}>
               <stat.icon className={`w-6 h-6 ${stat.color}`} />
             </div>
