@@ -140,7 +140,51 @@ public class AssetController {
             System.err.println("[ERROR] Download failed: " + e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
+    @DeleteMapping("/{assetId}")
+    public ResponseEntity<?> deleteAsset(@PathVariable String assetId) {
+        try {
+            var authentication = SecurityContextHolder.getContext().getAuthentication();
+            String uid = authentication.getName();
+            boolean isAdmin = authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+            AssetMetadata asset = mongoMetadataService.getAssetById(assetId);
+
+            if (asset == null) {
+                return ResponseEntity.status(404).body(Map.of("error", "Asset not found"));
+            }
+
+            if (!uid.equals(asset.getUploadedBy()) && !isAdmin) {
+                return ResponseEntity.status(403).body(Map.of("error", "Access Denied"));
+            }
+
+            // Delete raw blob from GridFS
+            if (asset.getMongoFileId() != null) {
+                mongoStorageService.deleteFile(asset.getMongoFileId());
+            }
+
+            // Delete metadata
+            mongoMetadataService.deleteAssetById(assetId);
+
+            // Log activity
+            ActivityLog activity = new ActivityLog();
+            activity.setActivityId(UUID.randomUUID().toString());
+            activity.setAssetId(assetId);
+            activity.setUserId(uid);
+            activity.setFileName(asset.getOriginalFileName());
+            activity.setAction("Deleted File");
+            activity.setEncryptedAtRest(true);
+            activity.setTimestamp(new Date());
+            mongoMetadataService.logActivity(activity);
+
+            return ResponseEntity.ok().body(Map.of("message", "File deleted successfully"));
+
+        } catch (Exception e) {
+            System.err.println("[ERROR] Delete failed: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+        }
     }
+
     private List<String> generateFallbackTags(String filename) {
         if (filename == null) return List.of("untagged");
         String nameWithoutExt = filename.replaceAll("\\.[^.]+$", "").toLowerCase();
