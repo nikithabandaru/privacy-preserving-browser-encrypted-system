@@ -3,10 +3,13 @@ import { Outlet, NavLink } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
 import VaultModal from '../components/VaultModal';
-import { LayoutDashboard, Image, Video, FileText } from 'lucide-react';
+import { LayoutDashboard, Image, Video, FileText, Settings, Shield } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 const Layout = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const { isAdmin } = useAuth();
+  
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
       <VaultModal />
@@ -18,7 +21,7 @@ const Layout = () => {
         </main>
         
         {/* Mobile Bottom Navigation */}
-        <nav className="md:hidden absolute bottom-0 w-full bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex justify-around items-center h-16 pb-safe z-50">
+        <nav className="md:hidden absolute bottom-0 w-full bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex justify-around items-center h-16 pb-safe z-50 px-1">
           <NavLink to="/" className={({isActive}) => `flex flex-col items-center justify-center w-full h-full ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
             <LayoutDashboard className="w-5 h-5" />
             <span className="text-[10px] mt-1 font-medium">Home</span>
@@ -35,6 +38,16 @@ const Layout = () => {
             <FileText className="w-5 h-5" />
             <span className="text-[10px] mt-1 font-medium">Docs</span>
           </NavLink>
+          <NavLink to="/settings" className={({isActive}) => `flex flex-col items-center justify-center w-full h-full ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
+            <Settings className="w-5 h-5" />
+            <span className="text-[10px] mt-1 font-medium">Settings</span>
+          </NavLink>
+          {isAdmin && (
+            <NavLink to="/admin" className={({isActive}) => `flex flex-col items-center justify-center w-full h-full ${isActive ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'}`}>
+              <Shield className="w-5 h-5" />
+              <span className="text-[10px] mt-1 font-medium">Admin</span>
+            </NavLink>
+          )}
         </nav>
       </div>
     </div>
