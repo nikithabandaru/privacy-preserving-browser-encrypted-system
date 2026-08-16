@@ -4,9 +4,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, LogOut, Upload, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { API_BASE_URL } from '../config/api';
+import { encryptFile } from '../utils/crypto';
 
 const Navbar = ({ onSearch }: { onSearch?: (q: string) => void }) => {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, vaultKey } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -27,12 +28,22 @@ const Navbar = ({ onSearch }: { onSearch?: (q: string) => void }) => {
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !currentUser) return;
+    
+    if (!vaultKey) {
+      alert("Your vault is locked! Please unlock your Vault before uploading files.");
+      return;
+    }
 
     try {
       setIsUploading(true);
+      
+      // 1. Encrypt the file client-side BEFORE uploading
+      const encryptedBlob = await encryptFile(file, vaultKey);
+      
       const token = await currentUser.getIdToken();
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', encryptedBlob, file.name);
+      formData.append('originalType', file.type);
 
       await axios.post(`${API_BASE_URL}/api/assets/upload`, formData, {
         headers: {
@@ -41,7 +52,7 @@ const Navbar = ({ onSearch }: { onSearch?: (q: string) => void }) => {
         },
       });
 
-      alert('File uploaded successfully from Navbar!');
+      alert('File encrypted and uploaded successfully!');
     } catch (error: any) {
       console.error('Upload failed:', error);
       alert('Upload failed: ' + (error.response?.data?.error || error.message));
