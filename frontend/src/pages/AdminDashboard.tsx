@@ -193,90 +193,95 @@ const AdminDashboard = () => {
         {loading ? (
           <div className="p-8 text-center text-gray-500">Loading...</div>
         ) : activeTab === 'users' ? (
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
-                <th className="p-4 font-medium text-gray-500 dark:text-gray-400">Email</th>
-                <th className="p-4 font-medium text-gray-500 dark:text-gray-400">UID</th>
-                <th className="p-4 font-medium text-gray-500 dark:text-gray-400">Joined</th>
-                <th className="p-4 font-medium text-gray-500 dark:text-gray-400 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map(u => (
-                <tr key={u.uid} className="border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                  <td className="p-4 font-medium text-gray-900 dark:text-white">{u.email}</td>
-                  <td className="p-4 text-gray-500 text-sm font-mono">{u.uid}</td>
-                  <td className="p-4 text-gray-500">{u.creationTimestamp ? new Date(u.creationTimestamp).toLocaleDateString() : 'Unknown'}</td>
-                  <td className="p-4 text-right">
-                    <button 
-                      onClick={() => {
-                        setSelectedUserFilter(u.uid);
-                        setActiveTab('files');
-                      }}
-                      className="px-3 py-1.5 text-sm bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50 rounded-lg transition-colors flex items-center justify-end ml-auto"
-                    >
-                      <Filter className="w-3.5 h-3.5 mr-1.5" />
-                      View Files
-                    </button>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[600px]">
+              <thead>
+                <tr className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
+                  <th className="p-4 font-medium text-gray-500 dark:text-gray-400">Email</th>
+                  <th className="p-4 font-medium text-gray-500 dark:text-gray-400">UID</th>
+                  <th className="p-4 font-medium text-gray-500 dark:text-gray-400">Joined</th>
+                  <th className="p-4 font-medium text-gray-500 dark:text-gray-400 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {users.map(u => (
+                  <tr key={u.uid} className="border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                    <td className="p-4 font-medium text-gray-900 dark:text-white">{u.email}</td>
+                    <td className="p-4 text-gray-500 text-sm font-mono">{u.uid}</td>
+                    <td className="p-4 text-gray-500">{u.creationTimestamp ? new Date(u.creationTimestamp).toLocaleDateString() : 'Unknown'}</td>
+                    <td className="p-4 text-right">
+                      <button 
+                        onClick={() => {
+                          setSelectedUserFilter(u.uid);
+                          setActiveTab('files');
+                        }}
+                        className="px-3 py-1.5 text-sm bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50 rounded-lg transition-colors flex items-center justify-end ml-auto"
+                      >
+                        <Filter className="w-3.5 h-3.5 mr-1.5" />
+                        View Files
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <div>
             {selectedUserFilter && (
               <div className="bg-indigo-50 dark:bg-indigo-900/20 px-4 py-3 flex items-center justify-between border-b border-indigo-100 dark:border-indigo-800/50">
                 <div className="flex items-center text-indigo-700 dark:text-indigo-300 text-sm font-medium">
                   <Filter className="w-4 h-4 mr-2" />
-                  Showing files specifically for user ID: <span className="font-mono ml-2 bg-indigo-100 dark:bg-indigo-800/50 px-2 py-0.5 rounded">{selectedUserFilter}</span>
+                  <span className="hidden sm:inline">Showing files specifically for user ID:</span>
+                  <span className="font-mono ml-2 bg-indigo-100 dark:bg-indigo-800/50 px-2 py-0.5 rounded text-xs truncate max-w-[150px] sm:max-w-none">{selectedUserFilter}</span>
                 </div>
                 <button 
                   onClick={() => setSelectedUserFilter(null)}
-                  className="flex items-center text-xs text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-200"
+                  className="flex items-center text-xs text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-200 shrink-0 ml-2"
                 >
                   <X className="w-3.5 h-3.5 mr-1" />
                   Clear Filter
                 </button>
               </div>
             )}
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
-                  <th className="p-4 font-medium text-gray-500 dark:text-gray-400">File Name</th>
-                  <th className="p-4 font-medium text-gray-500 dark:text-gray-400">Uploaded By</th>
-                  <th className="p-4 font-medium text-gray-500 dark:text-gray-400">Size</th>
-                  <th className="p-4 font-medium text-gray-500 dark:text-gray-400">Date</th>
-                  <th className="p-4 font-medium text-gray-500 dark:text-gray-400 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {displayedAssets.map(a => {
-                  const isOwnFile = a.uploadedBy === currentUser?.uid;
-                  return (
-                    <tr key={a.assetId} className="border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                      <td className="p-4 font-medium text-gray-900 dark:text-white">{a.originalFileName}</td>
-                      <td className="p-4 text-gray-900 dark:text-gray-300 font-medium truncate max-w-xs" title={a.uploadedBy}>{getUserDisplay(a.uploadedBy)}</td>
-                      <td className="p-4 text-gray-500">{formatBytes(a.fileSize)}</td>
-                      <td className="p-4 text-gray-500">{a.uploadDate ? new Date(a.uploadDate).toLocaleDateString() : 'Unknown'}</td>
-                      <td className="p-4 text-right">
-                        <button 
-                          onClick={() => handleDownloadEncrypted(a.assetId, a.originalFileName, a.uploadedBy, a.fileType)} 
-                          className={`p-2 rounded-lg transition-colors ${isOwnFile ? 'text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/50' : 'text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-900/50'}`}
-                          title={isOwnFile ? "View Your File" : "Download Encrypted Blob"}
-                        >
-                          {isOwnFile ? <Eye className="w-4 h-4" /> : <Download className="w-4 h-4" />}
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-                {displayedAssets.length === 0 && (
-                  <tr><td colSpan={5} className="p-8 text-center text-gray-500">No files found for this filter.</td></tr>
-                )}
-              </tbody>
-            </table>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[700px]">
+                <thead>
+                  <tr className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
+                    <th className="p-4 font-medium text-gray-500 dark:text-gray-400">File Name</th>
+                    <th className="p-4 font-medium text-gray-500 dark:text-gray-400">Uploaded By</th>
+                    <th className="p-4 font-medium text-gray-500 dark:text-gray-400">Size</th>
+                    <th className="p-4 font-medium text-gray-500 dark:text-gray-400">Date</th>
+                    <th className="p-4 font-medium text-gray-500 dark:text-gray-400 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {displayedAssets.map(a => {
+                    const isOwnFile = a.uploadedBy === currentUser?.uid;
+                    return (
+                      <tr key={a.assetId} className="border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                        <td className="p-4 font-medium text-gray-900 dark:text-white truncate max-w-[150px]">{a.originalFileName}</td>
+                        <td className="p-4 text-gray-900 dark:text-gray-300 font-medium truncate max-w-[150px]" title={a.uploadedBy}>{getUserDisplay(a.uploadedBy)}</td>
+                        <td className="p-4 text-gray-500 whitespace-nowrap">{formatBytes(a.fileSize)}</td>
+                        <td className="p-4 text-gray-500 whitespace-nowrap">{a.uploadDate ? new Date(a.uploadDate).toLocaleDateString() : 'Unknown'}</td>
+                        <td className="p-4 text-right">
+                          <button 
+                            onClick={() => handleDownloadEncrypted(a.assetId, a.originalFileName, a.uploadedBy, a.fileType)} 
+                            className={`p-2 rounded-lg transition-colors ${isOwnFile ? 'text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/50' : 'text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-900/50'}`}
+                            title={isOwnFile ? "View Your File" : "Download Encrypted Blob"}
+                          >
+                            {isOwnFile ? <Eye className="w-4 h-4" /> : <Download className="w-4 h-4" />}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {displayedAssets.length === 0 && (
+                    <tr><td colSpan={5} className="p-8 text-center text-gray-500">No files found for this filter.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
