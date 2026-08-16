@@ -110,9 +110,27 @@ const AdminDashboard = () => {
           document.body.removeChild(link);
         }
         setTimeout(() => URL.revokeObjectURL(fileURL), 60000);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to decrypt your asset:', error);
-        if (newTab) newTab.document.body.innerHTML = '<h2 style="color: #ef4444;">Failed to decrypt your file.</h2>';
+        if (newTab) {
+          let errorMessage = "Unknown error occurred";
+          if (error?.response?.data instanceof Blob) {
+             errorMessage = "Server returned an error blob (likely file not found in MongoDB)";
+          } else if (error?.response?.data?.error) {
+             errorMessage = error.response.data.error;
+          } else if (error?.message) {
+             errorMessage = error.message;
+          } else if (typeof error === 'object') {
+             errorMessage = "DOMException: Decryption strictly failed (Wrong Vault Passphrase entered)";
+          }
+
+          newTab.document.body.innerHTML = `
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background:#111; color:white; font-family:sans-serif;">
+              <h2 style="color: #ef4444;">Failed to decrypt or download file.</h2>
+              <p style="color: #9ca3af; margin-top: 10px; max-width: 600px; text-align: center;">Error details: ${errorMessage}</p>
+            </div>
+          `;
+        }
         alert('Could not preview this file.');
       }
       return;

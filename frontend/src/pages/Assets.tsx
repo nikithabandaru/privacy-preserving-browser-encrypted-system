@@ -155,7 +155,17 @@ const Assets = ({ type }: { type: 'images' | 'videos' | 'documents' }) => {
     } catch (error: any) {
       console.error('Failed to preview asset:', error);
       if (newTab) {
-        const errorMessage = error?.response?.data?.error || error?.message || "Unknown error occurred";
+        let errorMessage = "Unknown error occurred";
+        if (error?.response?.data instanceof Blob) {
+           errorMessage = "Server returned an error blob (likely file not found in MongoDB)";
+        } else if (error?.response?.data?.error) {
+           errorMessage = error.response.data.error;
+        } else if (error?.message) {
+           errorMessage = error.message;
+        } else if (typeof error === 'object') {
+           errorMessage = "DOMException: Decryption strictly failed (Wrong Vault Passphrase entered)";
+        }
+
         newTab.document.body.innerHTML = `
           <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background:#111; color:white; font-family:sans-serif;">
             <h2 style="color: #ef4444;">Failed to decrypt or download file.</h2>
