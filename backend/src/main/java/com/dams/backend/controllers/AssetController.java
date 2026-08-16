@@ -140,6 +140,8 @@ public class AssetController {
             System.err.println("[ERROR] Download failed: " + e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
+    }
+
     @DeleteMapping("/{assetId}")
     public ResponseEntity<?> deleteAsset(@PathVariable String assetId) {
         try {
