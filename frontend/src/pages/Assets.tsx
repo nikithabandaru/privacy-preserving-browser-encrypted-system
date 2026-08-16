@@ -152,12 +152,19 @@ const Assets = ({ type }: { type: 'images' | 'videos' | 'documents' }) => {
       
       setTimeout(() => URL.revokeObjectURL(fileURL), 60000); // keep URL alive for a bit
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to preview asset:', error);
       if (newTab) {
-        newTab.document.body.innerHTML = '<h2 style="color: #ef4444;">Failed to decrypt or download file.</h2>';
+        const errorMessage = error?.response?.data?.error || error?.message || "Unknown error occurred";
+        newTab.document.body.innerHTML = `
+          <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background:#111; color:white; font-family:sans-serif;">
+            <h2 style="color: #ef4444;">Failed to decrypt or download file.</h2>
+            <p style="color: #9ca3af; margin-top: 10px; max-width: 600px; text-align: center;">Error details: ${errorMessage}</p>
+            <p style="color: #9ca3af; margin-top: 10px; max-width: 600px; text-align: center; font-size: 14px;">If this is a decryption error, make sure you are using the exact same Vault Passphrase that was used to upload this file.</p>
+          </div>
+        `;
       }
-      alert('Could not preview this file.');
+      alert('Could not preview this file: ' + (error?.message || ""));
     }
   };
 
