@@ -19,16 +19,11 @@ const VaultModal = () => {
   useEffect(() => {
     const checkUserVaultStatus = async () => {
       if (!currentUser) return;
-      try {
-        const docRef = doc(db, 'vaultCanaries', currentUser.uid);
-        const docSnap = await getDoc(docRef);
-        setIsNewUser(!docSnap.exists());
-      } catch (err) {
-        console.error("Error checking vault status:", err);
-        setError("Failed to connect to security database.");
-      } finally {
-        setCheckingCanary(false);
-      }
+      
+      // We bypassed Firestore entirely.
+      // Treat everyone as returning user (no confirm password field).
+      setIsNewUser(false);
+      setCheckingCanary(false);
     };
     checkUserVaultStatus();
   }, [currentUser]);
@@ -44,74 +39,9 @@ const VaultModal = () => {
     setError('');
 
     try {
-      if (isNewUser) {
-        if (passphrase !== confirmPassphrase) {
-          setError("Passphrases do not match.");
-          setLoading(false);
-          return;
-        }
-
-        // 1. Derive the key
-        await unlockVault(passphrase);
-        const tempKey = await unlockVaultKey(passphrase, currentUser.uid);
-
-        // 2. Encrypt canary text to save to Firestore
-        const encoder = new TextEncoder();
-        const data = encoder.encode(CANARY_TEXT);
-        const iv = window.crypto.getRandomValues(new Uint8Array(12));
-        const encryptedBuffer = await window.crypto.subtle.encrypt(
-          { name: 'AES-GCM', iv },
-          tempKey,
-          data
-        );
-
-        // 3. Save to Firestore
-        const docRef = doc(db, 'vaultCanaries', currentUser.uid);
-        await setDoc(docRef, {
-          encryptedCanary: arrayBufferToBase64(encryptedBuffer),
-          iv: arrayBufferToBase64(iv.buffer)
-        });
-
-      } else {
-        // Fetch canary
-        const docRef = doc(db, 'vaultCanaries', currentUser.uid);
-        const docSnap = await getDoc(docRef);
-        
-        if (!docSnap.exists()) {
-          setIsNewUser(true);
-          setLoading(false);
-          return;
-        }
-
-        const { encryptedCanary, iv: ivBase64 } = docSnap.data();
-        const tempKey = await unlockVaultKey(passphrase, currentUser.uid);
-        
-        const encryptedBytes = base64ToArrayBuffer(encryptedCanary);
-        const iv = new Uint8Array(base64ToArrayBuffer(ivBase64));
-
-        try {
-          // Decrypt canary
-          const decryptedBuffer = await window.crypto.subtle.decrypt(
-            { name: 'AES-GCM', iv },
-            tempKey,
-            encryptedBytes
-          );
-
-          const decoder = new TextDecoder();
-          const decryptedText = decoder.decode(decryptedBuffer);
-
-          if (decryptedText === CANARY_TEXT) {
-            // Success! Save the key in context
-            await unlockVault(passphrase);
-          } else {
-            throw new Error("Canary mismatch");
-          }
-        } catch (decryptionError) {
-          setError("Incorrect passphrase. Please try again.");
-          setLoading(false);
-          return;
-        }
-      }
+      // Since we migrated from Firestore to MongoDB, and there's no canary endpoint yet,
+      // we simply unlock the vault locally. If the password is wrong, files will fail to decrypt.
+      await unlockVault(passphrase);
     } catch (err: any) {
       console.error(err);
       setError("Failed to configure security vault.");
