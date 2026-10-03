@@ -38,22 +38,7 @@ const Login = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      const userCredential = await signInWithPopup(auth, googleProvider);
-      const user = userCredential.user;
-      
-      const userRef = doc(db, 'users', user.uid);
-      const userSnap = await getDoc(userRef);
-      if (!userSnap.exists()) {
-        await setDoc(userRef, {
-          uid: user.uid,
-          name: user.displayName || '',
-          email: user.email || '',
-          photoURL: user.photoURL || '',
-          provider: 'google.com',
-          createdAt: serverTimestamp(),
-        });
-      }
-
+      await signInWithPopup(auth, googleProvider);
       navigate('/');
     } catch (err: any) {
       setError(err.message);

@@ -18,16 +18,6 @@ const Register = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(userCredential.user, { displayName: name });
       
-      const userRef = doc(db, 'users', userCredential.user.uid);
-      await setDoc(userRef, {
-        uid: userCredential.user.uid,
-        name: name,
-        email: email,
-        photoURL: '',
-        provider: 'password',
-        createdAt: serverTimestamp(),
-      });
-
       // Sign out the user so they are forced to log in manually
       await auth.signOut();
       
@@ -39,22 +29,7 @@ const Register = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      const userCredential = await signInWithPopup(auth, googleProvider);
-      const user = userCredential.user;
-      
-      const userRef = doc(db, 'users', user.uid);
-      const userSnap = await getDoc(userRef);
-      if (!userSnap.exists()) {
-        await setDoc(userRef, {
-          uid: user.uid,
-          name: user.displayName || '',
-          email: user.email || '',
-          photoURL: user.photoURL || '',
-          provider: 'google.com',
-          createdAt: serverTimestamp(),
-        });
-      }
-
+      await signInWithPopup(auth, googleProvider);
       navigate('/');
     } catch (err: any) {
       setError(err.message);
