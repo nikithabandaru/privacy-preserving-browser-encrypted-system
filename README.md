@@ -30,8 +30,30 @@ This application was designed with strict privacy-preserving principles:
 * **Admin Dashboard:** Role-based access control allowing the administrator to view aggregated user statistics.
 * **Responsive UI:** Fully mobile-responsive interface built with Tailwind CSS.
 
+## 📸 Application Screenshots
+
+### Main Dashboard
+![Main Dashboard](screenshots/dashboard.png)
+
+### Secure Vault Login
+![Secure Vault Login](screenshots/vault.png)
+
+### Encrypted Files Gallery
+![Encrypted Files Gallery](screenshots/files.png)
+
+### Global Admin Dashboard
+![Global Admin Dashboard](screenshots/admin.png)
+
 ## 💻 Local Development Setup
 
 **1. Clone the repository:**
 ```bash
 git clone https://github.com/nikithabandaru/privacy-preserving-browser-encrypted-system.git
+2. Start the Frontend:
+cd frontend
+npm install
+npm run dev
+3. Start the Java Backend:
+cd backend
+# Note: Requires setting up a local application-secret.properties with MongoDB credentials
+mvn spring-boot:run
